@@ -132,32 +132,37 @@ class DataPipeline:
     
     def create_features(self) -> Optional[Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """
-        Create lag features for model training
-        
+        Create lag features for model training.
+
         Returns:
-            Tuple of (X, y, dates) or None if feature creation fails
+            Tuple of (X, y, dates) or None if feature creation fails.
         """
         if self.processed_data is None:
             return None
-        
+
         try:
             data = self.processed_data.copy()
-            
+
+            # Ensure the Date column exists (it should after preprocessing)
+            if 'Date' not in data.columns:
+                data = data.reset_index()
+
             # Create lag-1 feature (previous day's close price)
             data['lag_1'] = data['Close'].shift(1)
-            
-            # Remove rows with NaN (first row will have NaN lag)
-            data = data.dropna()
-            
-            # Prepare features and target
-            X = data[['lag_1']].values
+
+            # Drop rows where the lag feature is NaN (the first row)
+            data = data.dropna(subset=['lag_1'])
+
+            # Prepare feature matrix X, target vector y and dates array
+            X = data['lag_1'].values.reshape(-1, 1)
             y = data['Close'].values
             dates = data['Date'].values
-            
+
+            # Store for possible later use
             self.X = X
             self.y = y
             self.dates = dates
-            
+
             return X, y, dates
         except Exception as e:
             print(f"Error creating features: {str(e)}")
