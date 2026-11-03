@@ -26,35 +26,7 @@ app.add_middleware(
 )
 
 # Pydantic models for request/response
-class StockSymbolRequest(BaseModel):
-    symbol: str
 
-class TrainingRequest(BaseModel):
-    symbol: str
-
-class PredictionRequest(BaseModel):
-    symbol: str
-    n_days: int = 10
-
-class HistoricalDataResponse(BaseModel):
-    symbol: str
-    data: List[dict]
-    message: str
-
-class TrainingResponse(BaseModel):
-    symbol: str
-    metrics: dict
-    message: str
-
-class PredictionResponse(BaseModel):
-    symbol: str
-    predictions: List[float]
-    message: str
-
-class MetricsResponse(BaseModel):
-    symbol: str
-    trained: bool
-    metrics: dict
 
 # Global state for models
 models_cache = {}
